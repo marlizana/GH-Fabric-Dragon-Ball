@@ -1,0 +1,26 @@
+name: Build Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/src/*.Report/**'
+      - '**/src/*.SemanticModel/**'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: BPA Semantic Models
+        run: pwsh ./scripts/bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
+
+      - name: BPA Reports
+        run: pwsh ./scripts/bpa-report.ps1 -path "." -src "./src/*.Report"
+
+      - name: Validate Naming Conventions
+        run: pwsh ./scripts/naming_conv_test.ps1
