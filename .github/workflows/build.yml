@@ -7,20 +7,22 @@ on:
     paths:
       - '**/src/*.Report/**'
       - '**/src/*.SemanticModel/**'
+  workflow_dispatch:
 
 jobs:
+
   build:
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: BPA Semantic Models
-        run: pwsh ./scripts/bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
+        run: ./scripts/bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
 
       - name: BPA Reports
-        run: pwsh ./scripts/bpa-report.ps1 -path "." -src "./src/*.Report"
+        run: ./scripts/bpa-report.ps1 -path "." -src "./src/*.Report"
 
       - name: Validate Naming Conventions
-        run: pwsh ./scripts/naming_conv_test.ps1
+        run: ./scripts/naming_conv_test.ps1
