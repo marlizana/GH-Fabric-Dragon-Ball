@@ -1,4 +1,4 @@
-name: Build Pipeline
+name: BPA semantic model and report validation and naming conventions
 
 on:
   pull_request:
