@@ -10,29 +10,19 @@ on:
   workflow_dispatch:
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Install PowerShell
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y powershell
-      
-      - name: Add execute permissions to scripts
-        run: chmod +x ./scripts/*.ps1
-        
+
       - name: BPA Semantic Models
-        shell: pwsh
         run: ./scripts/bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
 
       - name: BPA Reports
-        shell: pwsh
         run: ./scripts/bpa-report.ps1 -path "." -src "./src/*.Report"
 
       - name: Validate Naming Conventions
-        shell: pwsh
         run: ./scripts/naming_conv_test.ps1
