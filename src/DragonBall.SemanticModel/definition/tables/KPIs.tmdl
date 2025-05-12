@@ -1,0 +1,64 @@
+table KPIs
+	lineageTag: 12ff0a2f-f7ec-4f3c-b6e0-00157e04c299
+
+	measure CharactersWithTransformation = ```
+			
+			    CALCULATE(
+			        COUNTROWS(dragonball),
+			        NOT(ISBLANK(dragonball[transformation])),
+			        NOT(dragonball[transformation] = "None")
+			    )
+			```
+		formatString: 0
+		displayFolder: Counts
+		lineageTag: 85c8c83a-5bbb-4934-95ac-6e70b1193d35
+
+	measure CharsPerRace = CALCULATE(COUNTROWS(dragonball), ALLEXCEPT(dragonball, dragonball[race]))
+		formatString: #,##0
+		displayFolder: Counts
+		lineageTag: baba0a5e-02e6-4cfd-89da-94e75575202a
+
+	measure MaxPowerInSelection = ```
+			
+			    VAR _MaxPowerText = MAXX(
+			                            FILTER(
+			                                dragonball,
+			                                NOT(ISBLANK(dragonball[maxKi]))
+			                            ),
+			                            dragonball[maxKi]
+			                        )
+			    RETURN
+			        IF(
+			            ISNUMBER(VALUE(_MaxPowerText)),
+			            VALUE(_MaxPowerText),
+			            _MaxPowerText
+			        )
+			```
+		displayFolder: Power
+		lineageTag: f66e642e-8278-473b-807d-9df4c15d4ea2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure TotalCharacters = COUNTROWS(dragonball)
+		formatString: #,##0
+		displayFolder: Counts
+		lineageTag: fa7a63a6-542b-4337-9bef-f7856e99268f
+
+	measure TransformationPercentage = ```
+			
+			    DIVIDE(
+			        [CharactersWithTransformation],
+			        [TotalCharacters],
+			        0
+			    ) * 100
+			```
+		displayFolder: Ratios
+		lineageTag: 1696871f-8abe-40bd-954d-584da3e5330b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition KPIs = calculated
+		mode: import
+
+	annotation PBI_Id = e6a0a6cb59194a2d95c3ba35e6cb2eb4
+

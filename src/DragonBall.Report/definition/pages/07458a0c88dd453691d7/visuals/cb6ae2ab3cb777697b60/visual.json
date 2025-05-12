@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.7.0/schema.json",
+  "name": "cb6ae2ab3cb777697b60",
+  "position": {
+    "x": 38.632398019335064,
+    "y": 359.2813015798161,
+    "z": 2,
+    "height": 320.648903560481,
+    "width": 697.31478424899785
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dragonball"
+                    }
+                  },
+                  "Property": "race"
+                }
+              },
+              "queryRef": "dragonball.race",
+              "nativeQueryRef": "race"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dragonball"
+                    }
+                  },
+                  "Property": "gender"
+                }
+              },
+              "queryRef": "dragonball.gender",
+              "nativeQueryRef": "gender"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "KPIs"
+                    }
+                  },
+                  "Property": "CharsPerRace"
+                }
+              },
+              "queryRef": "KPIs.CharsPerRace",
+              "nativeQueryRef": "CharsPerRace"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "KPIs"
+                    }
+                  },
+                  "Property": "CharactersWithTransformation"
+                }
+              },
+              "queryRef": "KPIs.CharactersWithTransformation",
+              "nativeQueryRef": "CharactersWithTransformation"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "KPIs"
+                  }
+                },
+                "Property": "CharsPerRace"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

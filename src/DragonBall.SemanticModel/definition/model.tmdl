@@ -12,9 +12,10 @@ annotation PBIDesktopVersion = 2.142.928.0 (25.04)+de52df9f0bb74ad93a80d89c52d63
 
 annotation PBI_QueryOrder = ["dragonball"]
 
-annotation PBI_ProTooling = ["DevMode"]
+annotation PBI_ProTooling = ["DevMode","TMDLView_Desktop"]
 
 ref table dragonball
+ref table KPIs
 
 ref cultureInfo en-US
 

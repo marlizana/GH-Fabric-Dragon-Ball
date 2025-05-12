@@ -1,0 +1,73 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.7.0/schema.json",
+  "name": "cea317ebd865200b75c1",
+  "position": {
+    "x": 39.037063183903989,
+    "y": 34.157430285915993,
+    "z": 0,
+    "height": 299.28415107659725,
+    "width": 300.91069537592659
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "autoSelectVisualType": true,
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dragonball"
+                    }
+                  },
+                  "Property": "gender"
+                }
+              },
+              "queryRef": "dragonball.gender",
+              "nativeQueryRef": "gender"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "KPIs"
+                    }
+                  },
+                  "Property": "CharactersWithTransformation"
+                }
+              },
+              "queryRef": "KPIs.CharactersWithTransformation",
+              "nativeQueryRef": "CharactersWithTransformation"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "KPIs"
+                  }
+                },
+                "Property": "CharactersWithTransformation"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

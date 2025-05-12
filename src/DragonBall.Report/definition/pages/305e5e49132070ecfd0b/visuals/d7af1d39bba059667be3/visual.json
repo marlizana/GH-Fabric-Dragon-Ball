@@ -2,11 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.7.0/schema.json",
   "name": "d7af1d39bba059667be3",
   "position": {
-    "x": 19.303944315545245,
-    "y": 26.728538283062644,
-    "z": 1,
-    "height": 632.57540603248253,
-    "width": 579.1183294663573
+    "x": 337.79453345900095,
+    "y": 339.00094250706883,
+    "z": 0,
+    "height": 328.14326107445805,
+    "width": 442.75212064090482,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "advancedSlicerVisual",
@@ -58,47 +59,6 @@
                 "Literal": {
                   "Value": "true"
                 }
-              }
-            },
-            "filter": {
-              "filter": {
-                "Version": 2,
-                "From": [
-                  {
-                    "Name": "d",
-                    "Entity": "dragonball",
-                    "Type": 0
-                  }
-                ],
-                "Where": [
-                  {
-                    "Condition": {
-                      "In": {
-                        "Expressions": [
-                          {
-                            "Column": {
-                              "Expression": {
-                                "SourceRef": {
-                                  "Source": "d"
-                                }
-                              },
-                              "Property": "name"
-                            }
-                          }
-                        ],
-                        "Values": [
-                          [
-                            {
-                              "Literal": {
-                                "Value": "'Broly'"
-                              }
-                            }
-                          ]
-                        ]
-                      }
-                    }
-                  }
-                ]
               }
             }
           }

@@ -80,7 +80,7 @@
           ]
         },
         {
-          "paramMaxVisualsPerPage": 20
+          "paramMaxVisualsPerPage": 5
         },
         true
       ]
