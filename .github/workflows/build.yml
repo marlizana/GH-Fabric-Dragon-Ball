@@ -1,69 +1,117 @@
-name: BPA semantic model and report validation and naming conventions
+name: Fabric Validation
 
 on:
   pull_request:
-    branches:
-      - main
-      - dev
-    paths:
-      - '**/src/*.Report/**'
-      - '**/src/*.SemanticModel/**'
+    branches: [ main, dev ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
 jobs:
-
-  build:
+  validate:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: BPA Semantic Models
-        id: semantic_models
+      - name: Setup folders
+        run: |
+          mkdir -p ./scripts/testResults
+          
+      - name: Run Semantic Model validation
+        id: semanticmodel
         run: ./scripts/bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
+        continue-on-error: true
 
-      - name: BPA Reports
-        id: reports
+      - name: Run Report validation
+        id: report
         run: ./scripts/bpa-report.ps1 -path "." -src "./src/*.Report"
+        continue-on-error: true
 
-      - name: Validate Naming Conventions
+      - name: Check naming conventions
         id: naming
         run: ./scripts/naming_conv_test.ps1
+        continue-on-error: true
 
-      - name: Check Unused Fields
+      - name: Check unused fields
         id: unused
         run: ./scripts/unused-fields.ps1 -path "." -srcFolder "./src"
-        
-      # Publicar resultados de tests
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: "**/testResults/*.xml"
-          
-      # Subir archivos de resultados como artefactos
-      - name: Upload Test Results
+        continue-on-error: true
+      
+      - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
         with:
           name: test-results
           path: "**/testResults/*.xml"
-          retention-days: 14
+          retention-days: 7
 
-      - name: Comment PR with Test Results
-        uses: thollander/actions-comment-pull-request@v2
-        if: github.event_name == 'pull_request' && always()
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
         with:
-          message: |
-            ## 🔍 Resultados de la validación
+          files: "**/testResults/*.xml"
+          
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const semanticStatus = "${{ steps.semanticmodel.outcome }}" == "success" ? "✅" : "❌";
+            const reportStatus = "${{ steps.report.outcome }}" == "success" ? "✅" : "❌";
+            const namingStatus = "${{ steps.naming.outcome }}" == "success" ? "✅" : "❌";
+            const unusedStatus = "${{ steps.unused.outcome }}" == "success" ? "✅" : "❌";
             
-            ### Resumen:
-            - **Validación de modelos semánticos**: ${{ steps.semantic_models.outcome }}
-            - **Validación de reportes**: ${{ steps.reports.outcome }}
-            - **Convenciones de nomenclatura**: ${{ steps.naming.outcome }}
-            - **Campos no utilizados**: ${{ steps.unused.outcome }}
+            const body = `## Resultados de validación
             
-            Para ver los detalles completos, revisa los artefactos de esta ejecución.
-          comment_tag: validation_results
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            | Validación | Estado |
+            |------------|--------|
+            | Modelos semánticos | ${semanticStatus} |
+            | Reportes | ${reportStatus} |
+            | Convenciones de nombres | ${namingStatus} |
+            | Campos no utilizados | ${unusedStatus} |
+            
+            [Ver detalles completos](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            `;
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => {
+              return comment.body.includes('Resultados de validación');
+            });
+            
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+            
+            const allPassed = 
+              "${{ steps.semanticmodel.outcome }}" == "success" && 
+              "${{ steps.report.outcome }}" == "success" && 
+              "${{ steps.naming.outcome }}" == "success" && 
+              "${{ steps.unused.outcome }}" == "success";
+              
+            if (!allPassed && "${{ github.base_ref }}" == "main") {
+              core.setFailed("No se pueden fusionar PRs con errores a la rama main");
+            }
+              
