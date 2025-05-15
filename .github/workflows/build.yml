@@ -34,3 +34,36 @@ jobs:
       - name: Check Unused Fields
         id: unused
         run: ./scripts/unused-fields.ps1 -path "." -srcFolder "./src"
+        
+      # Publicar resultados de tests
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: "**/testResults/*.xml"
+          
+      # Subir archivos de resultados como artefactos
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results
+          path: "**/testResults/*.xml"
+          retention-days: 14
+
+      - name: Comment PR with Test Results
+        uses: thollander/actions-comment-pull-request@v2
+        if: github.event_name == 'pull_request' && always()
+        with:
+          message: |
+            ## 🔍 Resultados de la validación
+            
+            ### Resumen:
+            - **Validación de modelos semánticos**: ${{ steps.semantic_models.outcome }}
+            - **Validación de reportes**: ${{ steps.reports.outcome }}
+            - **Convenciones de nomenclatura**: ${{ steps.naming.outcome }}
+            - **Campos no utilizados**: ${{ steps.unused.outcome }}
+            
+            Para ver los detalles completos, revisa los artefactos de esta ejecución.
+          comment_tag: validation_results
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
