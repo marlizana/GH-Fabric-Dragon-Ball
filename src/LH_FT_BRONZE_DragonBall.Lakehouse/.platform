@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "LH_FT_BRONZE_DragonBall"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4450d119-5291-9d25-495c-6ef0e45b8ac4"
+  }
+}

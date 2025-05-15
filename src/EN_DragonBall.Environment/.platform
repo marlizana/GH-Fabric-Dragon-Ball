@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Environment",
+    "displayName": "EN_DragonBall",
+    "description": "Environment"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "7fc722c5-3976-83b3-47f7-ac33b2923144"
+  }
+}

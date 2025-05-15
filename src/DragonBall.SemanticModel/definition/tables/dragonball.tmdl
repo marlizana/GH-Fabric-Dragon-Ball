@@ -1,0 +1,121 @@
+table dragonball
+	lineageTag: cb1a54a4-b176-423a-beb6-abbbf13916f9
+
+	column name
+		dataType: string
+		lineageTag: b9915591-ab4d-44c3-a675-6759b0348b4d
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column ki
+		dataType: string
+		lineageTag: cd3a627f-0ffd-4e3c-a4b9-0f78a9fe2bf2
+		summarizeBy: none
+		sourceColumn: ki
+
+		annotation SummarizationSetBy = Automatic
+
+	column maxKi
+		dataType: string
+		lineageTag: cca6365f-e11b-4a81-9476-6149eeca4144
+		summarizeBy: none
+		sourceColumn: maxKi
+
+		annotation SummarizationSetBy = Automatic
+
+	column race
+		dataType: string
+		lineageTag: 1c7e4428-2cb9-4090-b1e9-92db5951b8e0
+		summarizeBy: none
+		sourceColumn: race
+
+		annotation SummarizationSetBy = Automatic
+
+	column gender
+		dataType: string
+		lineageTag: 2c6021d9-9789-4ab1-9796-12d5dba97cd5
+		summarizeBy: none
+		sourceColumn: gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: b89023c4-b69f-49e5-907c-3266d344345c
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column image
+		dataType: string
+		lineageTag: 1b1e0c18-41a8-46ab-bf3b-90e82e9de8a3
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: image
+
+		annotation SummarizationSetBy = Automatic
+
+	column affiliation
+		dataType: string
+		lineageTag: 24c2a5c6-9f10-487d-ac26-28dd53f8ae7d
+		summarizeBy: none
+		sourceColumn: affiliation
+
+		annotation SummarizationSetBy = Automatic
+
+	column ki_blast
+		dataType: string
+		lineageTag: e1cc4a8b-ec6c-470a-b466-650095dcb98a
+		summarizeBy: none
+		sourceColumn: ki_blast
+
+		annotation SummarizationSetBy = Automatic
+
+	column melee_combat
+		dataType: string
+		lineageTag: ccb846bc-1dec-46c0-9564-d731d31d1885
+		summarizeBy: none
+		sourceColumn: melee_combat
+
+		annotation SummarizationSetBy = Automatic
+
+	column speed
+		dataType: string
+		lineageTag: 3edf9b8b-618a-41d8-b5b7-a4ecbd57326b
+		summarizeBy: none
+		sourceColumn: speed
+
+		annotation SummarizationSetBy = Automatic
+
+	column special_attack
+		dataType: string
+		lineageTag: b1b8d56e-45ee-4cef-810b-b746d40ac9b5
+		summarizeBy: none
+		sourceColumn: special_attack
+
+		annotation SummarizationSetBy = Automatic
+
+	column transformation
+		dataType: string
+		lineageTag: bef125eb-21d3-4a4d-bff3-c9edfcba56e2
+		summarizeBy: none
+		sourceColumn: transformation
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dragonball = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("wynwxpdmb3bezixuwnqdytowva-w7thrf44tzku7b3zuylayykr3m.datawarehouse.fabric.microsoft.com", "LH_FT_BRONZE_DragonBall"),
+				    LH_FT_BRONZE_DragonBall_dragonball = Source{[Schema="LH_FT_BRONZE_DragonBall",Item="dragonball"]}[Data]
+				in
+				    LH_FT_BRONZE_DragonBall_dragonball
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

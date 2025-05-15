@@ -1,0 +1,31 @@
+name: BPA semantic model and report validation and naming conventions
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/src/*.Report/**'
+      - '**/src/*.SemanticModel/**'
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: BPA Semantic Models
+        run: ./scripts/bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
+
+      - name: BPA Reports
+        run: ./scripts/bpa-report.ps1 -path "." -src "./src/*.Report"
+
+      - name: Validate Naming Conventions
+        run: ./scripts/naming_conv_test.ps1
+
+      - name: Check Unused Fields
+        run: ./scripts/unused-fields.ps1 -path "." -srcFolder "./src"

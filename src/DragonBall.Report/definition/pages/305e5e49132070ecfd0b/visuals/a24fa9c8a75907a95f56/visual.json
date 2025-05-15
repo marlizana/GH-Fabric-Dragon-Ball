@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.7.0/schema.json",
+  "name": "a24fa9c8a75907a95f56",
+  "position": {
+    "x": 810.70688030160227,
+    "y": 373.98680490103681,
+    "z": 1000,
+    "height": 301.60226201696514,
+    "width": 436.72007540056552,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "autoSelectVisualType": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dragonball"
+                    }
+                  },
+                  "Property": "description"
+                }
+              },
+              "queryRef": "dragonball.description",
+              "nativeQueryRef": "description"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dragonball"
+                  }
+                },
+                "Property": "description"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
