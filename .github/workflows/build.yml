@@ -26,3 +26,6 @@ jobs:
 
       - name: Validate Naming Conventions
         run: ./scripts/naming_conv_test.ps1
+
+      - name: Check Unused Fields
+        run: ./scripts/unused-fields.ps1 -path "." -srcFolder "./src"
