@@ -51,4 +51,3 @@ jobs:
             Para ver los detalles completos, revisa los artefactos de esta ejecución.
           comment_tag: validation_results
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- 
