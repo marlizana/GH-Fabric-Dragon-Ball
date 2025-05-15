@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
     paths:
       - '**/src/*.Report/**'
       - '**/src/*.SemanticModel/**'
@@ -19,13 +20,35 @@ jobs:
         uses: actions/checkout@v4
 
       - name: BPA Semantic Models
+        id: semantic_models
         run: ./scripts/bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
 
       - name: BPA Reports
+        id: reports
         run: ./scripts/bpa-report.ps1 -path "." -src "./src/*.Report"
 
       - name: Validate Naming Conventions
+        id: naming
         run: ./scripts/naming_conv_test.ps1
 
       - name: Check Unused Fields
+        id: unused
         run: ./scripts/unused-fields.ps1 -path "." -srcFolder "./src"
+
+      - name: Comment PR with Test Results
+        uses: thollander/actions-comment-pull-request@v2
+        if: github.event_name == 'pull_request' && always()
+        with:
+          message: |
+            ## 🔍 Resultados de la validación
+            
+            ### Resumen:
+            - **Validación de modelos semánticos**: ${{ steps.semantic_models.outcome }}
+            - **Validación de reportes**: ${{ steps.reports.outcome }}
+            - **Convenciones de nomenclatura**: ${{ steps.naming.outcome }}
+            - **Campos no utilizados**: ${{ steps.unused.outcome }}
+            
+            Para ver los detalles completos, revisa los artefactos de esta ejecución.
+          comment_tag: validation_results
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
