@@ -11,7 +11,7 @@ permissions:
   checks: write
 
 jobs:
-  validate:
+  FabricValidation:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
