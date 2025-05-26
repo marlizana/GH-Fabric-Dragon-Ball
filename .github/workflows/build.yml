@@ -84,111 +84,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require('fs');
-            const path = require('path');
-
-            function getTestCounts(xmlRelativePath) {
-              const basePath = 'downloaded-test-results/scripts/testResults'; 
-              const fullPath = path.join(basePath, xmlRelativePath);
-              let passed = 0;
-              let failed = 0;
-
-              try {
-                if (!fs.existsSync(fullPath)) {
-                  core.warning(`Test result file not found: ${fullPath}`);
-                  return { passed, failed };
-                }
-                const xmlContent = fs.readFileSync(fullPath, 'utf8');
-                
-                let match = xmlContent.match(/<test-run[^>]*\sfailed="(\d+)"[^>]*\spassed="(\d+)"/);
-                if (!match) { 
-                    match = xmlContent.match(/<test-run[^>]*\spassed="(\d+)"[^>]*\sfailed="(\d+)"/);
-                }
-
-                if (match && match.length === 3) {
-                  failed = parseInt(match[1]); 
-                  passed = parseInt(match[2]); 
-                  if (isNaN(failed) || isNaN(passed)) { 
-                    passed = parseInt(match[1]);
-                    failed = parseInt(match[2]);
-                  }
-                } else {
-                  match = xmlContent.match(/<test-suite[^>]*\sfailed="(\d+)"[^>]*\spassed="(\d+)"/);
-                  if (!match) {
-                      match = xmlContent.match(/<test-suite[^>]*\spassed="(\d+)"[^>]*\sfailed="(\d+)"/);
-                  }
-                  if (match && match.length === 3) {
-                    failed = parseInt(match[1]);
-                    passed = parseInt(match[2]);
-                    if (isNaN(failed) || isNaN(passed)) {
-                        passed = parseInt(match[1]);
-                        failed = parseInt(match[2]);
-                    }
-                  } else {
-                    core.warning(`Could not parse passed/failed counts from ${fullPath} using regex on test-run or test-suite.`);
-                    passed = (xmlContent.match(/<test-case[^>]*result="Passed"/g) || []).length + (xmlContent.match(/<test-case[^>]*result="Succeeded"/g) || []).length;
-                    failed = (xmlContent.match(/<test-case[^>]*result="Failed"/g) || []).length;
-                  }
-                }
-              } catch (e) {
-                core.error(`Error processing ${fullPath}: ${e.message}`);
-              }
-              return { passed, failed };
-            }
-
-            const semanticFile = 'SemanticModel_PesterResults.xml'; 
-            const reportFile = 'Report_PesterResults.xml';         
-            const namingFile = 'Naming_PesterResults.xml';         
-            const unusedFile = 'Unused_PesterResults.xml';         
-
-            const semanticCounts = getTestCounts(semanticFile);
-            const reportCounts = getTestCounts(reportFile);
-            const namingCounts = getTestCounts(namingFile);
-            const unusedCounts = getTestCounts(unusedFile);
-
-            const semanticOverallStatus = "${{ needs.FabricValidation.outputs.semantic_outcome }}" == "success" ? "✅" : "❌";
-            const reportOverallStatus = "${{ needs.FabricValidation.outputs.report_outcome }}" == "success" ? "✅" : "❌";
-            const namingOverallStatus = "${{ needs.FabricValidation.outputs.naming_outcome }}" == "success" ? "✅" : "❌";
-            const unusedOverallStatus = "${{ needs.FabricValidation.outputs.unused_outcome }}" == "success" ? "✅" : "❌";
-            
-            const body = `## Resultados de validación
-            
-            | Validación              | Estado | Detalle (Fallados / Pasados) |
-            |-------------------------|--------|------------------------------|
-            | Modelos semánticos      | ${semanticOverallStatus}       | ❌ ${semanticCounts.failed} / ✅ ${semanticCounts.passed}   |
-            | Reportes                | ${reportOverallStatus}       | ❌ ${reportCounts.failed} / ✅ ${reportCounts.passed}   |
-            | Convenciones de nombres | ${namingOverallStatus}       | ❌ ${namingCounts.failed} / ✅ ${namingCounts.passed}   |
-            | Campos no utilizados    | ${unusedOverallStatus}       | ❌ ${unusedCounts.failed} / ✅ ${unusedCounts.passed}   |
-            
-            [Ver detalles completos de la ejecución](${context.payload.repository.html_url}/actions/runs/${{ github.run_id }})
-            `;
-            
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            
-            const botComment = comments.find(comment => {
-              return comment.user && comment.user.login === 'github-actions[bot]' && comment.body.includes('Resultados de validación');
-            });
-            
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              });
-            }
-            
             const allPassedByOutcome = 
               "${{ needs.FabricValidation.outputs.semantic_outcome }}" == "success" && 
               "${{ needs.FabricValidation.outputs.report_outcome }}" == "success" && 
@@ -196,5 +91,5 @@ jobs:
               "${{ needs.FabricValidation.outputs.unused_outcome }}" == "success";
               
             if (!allPassedByOutcome && "${{ github.base_ref }}" == "main") {
-              core.setFailed("Al menos una validación (basada en el outcome del paso) falló. No se pueden fusionar PRs con errores a la rama main.");
+              core.setFailed("Al menos una validación (basada en el outcome del paso) falló. No se pueden fusionar PRs con errores a la rama.");
             }
