@@ -2,7 +2,7 @@
 
 ## Visión general
 
-El proyecto "Dragon Ball Analytics Platform" es una demostración de una solución completa de analítica moderna utilizando Microsoft Fabric. Permite el seguimiento, análisis y visualización de datos relacionados con personajes del universo Dragon Ball, proporcionando insights valiosos sobre sus características, habilidades y relaciones.
+El proyecto "Dragon Ball Analytics Platform" es una demostración de una solución completa de analítica moderna utilizando Microsoft Fabric. Permite el seguimiento, análisfis y visualización de datos relacionados con personajes del universo Dragon Ball, proporcionando insights valiosos sobre sus características, habilidades y relaciones.
 
 ## Valor de negocio
 
