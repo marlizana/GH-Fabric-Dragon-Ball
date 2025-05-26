@@ -13,6 +13,11 @@ permissions:
 jobs:
   FabricValidation:
     runs-on: windows-latest
+    outputs:
+      semantic_outcome: ${{ steps.semanticmodel.outcome }}
+      report_outcome: ${{ steps.report.outcome }}
+      naming_outcome: ${{ steps.naming.outcome }}
+      unused_outcome: ${{ steps.unused.outcome }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,7 +26,7 @@ jobs:
 
       - name: Setup folders
         run: |
-          mkdir -p ./scripts/testResults
+          New-Item -ItemType Directory -Force -Path ./scripts/testResults
           
       - name: Run Semantic Model validation
         id: semanticmodel
@@ -51,21 +56,38 @@ jobs:
           path: "**/testResults/*.xml"
           retention-days: 7
 
+  PublishAndComment:
+    runs-on: ubuntu-latest
+    needs: FabricValidation
+    if: always()
+    permissions:
+      pull-requests: write
+      checks: write
+      contents: read
+    steps:
+      - name: Checkout repository 
+        uses: actions/checkout@v4
+
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: downloaded-test-results
+
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
         with:
-          files: "**/testResults/*.xml"
-          
-      - name: Comment PR with results
-        if: github.event_name == 'pull_request' && always()
+          files: "downloaded-test-results/**/*.xml"
+
+      - name: Comment PR and Check Failures
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           script: |
-            const semanticStatus = "${{ steps.semanticmodel.outcome }}" == "success" ? "✅" : "❌";
-            const reportStatus = "${{ steps.report.outcome }}" == "success" ? "✅" : "❌";
-            const namingStatus = "${{ steps.naming.outcome }}" == "success" ? "✅" : "❌";
-            const unusedStatus = "${{ steps.unused.outcome }}" == "success" ? "✅" : "❌";
+            const semanticStatus = "${{ needs.FabricValidation.outputs.semantic_outcome }}" == "success" ? "✅" : "❌";
+            const reportStatus = "${{ needs.FabricValidation.outputs.report_outcome }}" == "success" ? "✅" : "❌";
+            const namingStatus = "${{ needs.FabricValidation.outputs.naming_outcome }}" == "success" ? "✅" : "❌";
+            const unusedStatus = "${{ needs.FabricValidation.outputs.unused_outcome }}" == "success" ? "✅" : "❌";
             
             const body = `## Resultados de validación
             
@@ -76,7 +98,7 @@ jobs:
             | Convenciones de nombres | ${namingStatus} |
             | Campos no utilizados | ${unusedStatus} |
             
-            [Ver detalles completos](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            [Ver detalles completos](${context.payload.repository.html_url}/actions/runs/${{ github.run_id }})
             `;
             
             const { data: comments } = await github.rest.issues.listComments({
@@ -86,18 +108,18 @@ jobs:
             });
             
             const botComment = comments.find(comment => {
-              return comment.body.includes('Resultados de validación');
+              return comment.user && comment.user.login === 'github-actions[bot]' && comment.body.includes('Resultados de validación');
             });
             
             if (botComment) {
-              github.rest.issues.updateComment({
+              await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: botComment.id,
                 body: body
               });
             } else {
-              github.rest.issues.createComment({
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
@@ -106,11 +128,11 @@ jobs:
             }
             
             const allPassed = 
-              "${{ steps.semanticmodel.outcome }}" == "success" && 
-              "${{ steps.report.outcome }}" == "success" && 
-              "${{ steps.naming.outcome }}" == "success" && 
-              "${{ steps.unused.outcome }}" == "success";
+              "${{ needs.FabricValidation.outputs.semantic_outcome }}" == "success" && 
+              "${{ needs.FabricValidation.outputs.report_outcome }}" == "success" && 
+              "${{ needs.FabricValidation.outputs.naming_outcome }}" == "success" && 
+              "${{ needs.FabricValidation.outputs.unused_outcome }}" == "success";
               
             if (!allPassed && "${{ github.base_ref }}" == "main") {
-              core.setFailed("No se pueden fusionar PRs con errores a la rama main");
+              core.setFailed("Al menos una validación falló. No se pueden fusionar PRs con errores a la rama main.");
             }
