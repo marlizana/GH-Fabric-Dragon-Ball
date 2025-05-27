@@ -1,4 +1,4 @@
-# Fabric Dragon Ball: Calidad y Gobernanza Automatizada con GitHub Actions
+# Fabric Dragon Ball: Calidad y gobernanza automatizada con GitHub Actions
 
 ## Visión General
 
