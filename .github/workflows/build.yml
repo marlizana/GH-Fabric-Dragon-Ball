@@ -84,55 +84,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const semanticStatus = "${{ needs.FabricValidation.outputs.semantic_outcome }}" == "success" ? "✅" : "❌";
-            const reportStatus = "${{ needs.FabricValidation.outputs.report_outcome }}" == "success" ? "✅" : "❌";
-            const namingStatus = "${{ needs.FabricValidation.outputs.naming_outcome }}" == "success" ? "✅" : "❌";
-            const unusedStatus = "${{ needs.FabricValidation.outputs.unused_outcome }}" == "success" ? "✅" : "❌";
-            
-            const body = `## Resultados de validación
-            
-            | Validación | Estado |
-            |------------|--------|
-            | Modelos semánticos | ${semanticStatus} |
-            | Reportes | ${reportStatus} |
-            | Convenciones de nombres | ${namingStatus} |
-            | Campos no utilizados | ${unusedStatus} |
-            
-            [Ver detalles completos](${context.payload.repository.html_url}/actions/runs/${{ github.run_id }})
-            `;
-            
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            
-            const botComment = comments.find(comment => {
-              return comment.user && comment.user.login === 'github-actions[bot]' && comment.body.includes('Resultados de validación');
-            });
-            
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              });
-            }
-            
-            const allPassed = 
+            const allPassedByOutcome = 
               "${{ needs.FabricValidation.outputs.semantic_outcome }}" == "success" && 
               "${{ needs.FabricValidation.outputs.report_outcome }}" == "success" && 
               "${{ needs.FabricValidation.outputs.naming_outcome }}" == "success" && 
               "${{ needs.FabricValidation.outputs.unused_outcome }}" == "success";
               
-            if (!allPassed && "${{ github.base_ref }}" == "main") {
-              core.setFailed("Al menos una validación falló. No se pueden fusionar PRs con errores a la rama main.");
+            if (!allPassedByOutcome && "${{ github.base_ref }}" == "main") {
+              core.setFailed("Al menos una validación (basada en el outcome del paso) falló. No se pueden fusionar PRs con errores a la rama.");
             }
