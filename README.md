@@ -1,78 +1,92 @@
-  # Dragon Ball Analytics Platform
+# Fabric Dragon Ball: Calidad y Gobernanza Automatizada con GitHub Actions
 
-## Visión general
+## Visión General
 
-El proyecto "Dragon Ball Analytics Platform" es una demostración de una solución completa de analítica moderna utilizando Microsoft Fabric. Permite el seguimiento, análisfis y visualización de datos relacionados con personajes del universo Dragon Ball, proporcionando insights valiosos sobre sus características, habilidades y relaciones.
+Bienvenido al proyecto "Fabric Dragon Ball", una demostración de cómo implementar una plataforma analítica robusta en Microsoft Fabric con un fuerte enfoque en la calidad y gobernanza automatizada utilizando GitHub Actions.
 
-## Valor de negocio
+Este proyecto utiliza datos del universo Dragon Ball para ilustrar una solución end-to-end que garantiza:
 
-Este proyecto demuestra cómo implementar una plataforma analítica end-to-end con CI/CD automatizado, garantizando:
+-   **Calidad en el desarrollo:** Mediante validaciones automáticas integradas en el flujo de trabajo de GitHub.
+-   **Gobernanza efectiva:** Aplicando estándares y buenas prácticas de forma consistente.
+-   **Desarrollo ágil:** A través de la Integración Continua (CI) y el Despliegue Continuo (CD) facilitados por GitHub Actions.
 
-- **Calidad de datos consistente**: Validación automática de modelos semánticos y reportes
-- **Gobernanza de datos**: Implementación de estándares de nomenclatura y buenas prácticas
-- **Desarrollo ágil**: Integración continua y despliegue continuo para acelerar el time-to-market
-- **Escalabilidad**: Arquitectura preparada para crecer con el negocio
+## Valor de Negocio
 
-## Arquitectura
+Este proyecto demuestra cómo implementar una plataforma analítica moderna con CI/CD automatizado en GitHub, garantizando:
 
-La solución utiliza una arquitectura moderna de lakehouse con diferentes capas:
+-   **Calidad de datos y artefactos consistente**: Validación automática de modelos semánticos y reportes.
+-   **Gobernanza de datos proactiva**: Implementación y verificación automática de estándares de nomenclatura y buenas prácticas.
+-   **Desarrollo ágil y eficiente**: Integración continua para acelerar el time-to-market y reducir errores manuales.
+-   **Colaboración mejorada**: Flujos de trabajo claros y automatizados para los Pull Requests.
 
-1. **Capa Bronze**: Ingesta y almacenamiento de datos crudos de Dragon Ball
-2. **Capa Semántica**: Modelado de datos para análisis
-3. **Capa de Visualización**: Informes y dashboards para consumo final
+## Arquitectura de la Automatización
 
-## Componentes principales
+La solución se centra en la automatización de la calidad y la gobernanza mediante:
 
-### Ingesta y procesamiento de datos
-- **Notebook (NB_BRONZE_DragonBall)**: Extrae datos de personajes desde Kaggle y realiza transformaciones iniciales
-- **Lakehouse (LH_FT_BRONZE_DragonBall)**: Almacena los datos en formato Delta para optimizar consultas
+1.  **Scripts de Validación PowerShell**: Herramientas personalizadas para analizar los artefactos de Microsoft Fabric.
+2.  **Flujos de Trabajo de GitHub Actions**: Orquestación de la ejecución de los scripts y gestión de los Pull Requests.
+3.  **Reglas de Protección de Rama**: Para asegurar la integridad de las ramas principales.
 
-### Modelado de datos
-- **Modelo Semántico (DragonBall.SemanticModel)**: Define relaciones entre entidades, métricas y KPIs para análisis avanzados
-- Incluye tablas de personajes con atributos como poder, velocidad, técnicas especiales y afiliaciones
+## Componentes Principales de la Automatización
 
-### Visualización
-- **Informes (DragonBall.Report)**: Dashboards interactivos que permiten:
-  - Comparar habilidades entre personajes
-  - Filtrar por razas o afiliaciones
-  - Analizar características detalladas de cada personaje
+### Scripts de Automatización PowerShell
 
-## Automatización y CI/CD
+El corazón de esta estrategia de calidad son cuatro scripts PowerShell que analizan modelos semánticos, reportes, convenciones de nomenclatura y campos no utilizados. Cada script genera informes en formato NUnit XML, listos para ser procesados por el flujo de trabajo de CI/CD.
 
-El proyecto implementa un completo pipeline de CI/CD para garantizar la calidad y consistencia:
+-   `bpa-semanticmodel.ps1`: Análisis de buenas prácticas para modelos semánticos.
+-   `bpa-report.ps1`: Análisis de buenas prácticas para informes.
+-   `naming_conv_test.ps1`: Validación de convenciones de nomenclatura.
+-   `unused-fields.ps1`: Detección de campos no utilizados en los modelos.
 
-### Pipeline Azure DevOps (ado-pipe-build.yaml)
-- **Validación de modelos semánticos**: Verifica buenas prácticas en modelos de datos
-- **Validación de informes**: Asegura que los informes siguen estándares de diseño y rendimiento
-- **Verificación de nomenclatura**: Garantiza que todos los componentes sigan las convenciones establecidas
+*Para una descripción detallada de cada script y su funcionamiento, consulta nuestro [artículo sobre herramientas de validación](https://medium.com/@akanemar/calidad-nivel-saiyan-automatizando-los-test-de-calidad-y-gobernanza-de-microsoft-fabric-3284b9f06d43).*
 
-### Scripts de automatización
-- `bpa-semanticmodel.ps1`: Análisis de buenas prácticas para modelos semánticos
-- `bpa-report.ps1`: Análisis de buenas prácticas para informes
-- `naming_conv_test.ps1`: Validación de convenciones de nomenclatura
+### Automatización con GitHub Actions
 
-## Ventajas para el negocio
+Este repositorio utiliza GitHub Actions para la Integración Continua.
 
-- **Insights accionables**: Comprensión profunda de las características de los personajes de Dragon Ball
-- **Consistencia de datos**: Garantía de calidad mediante validación automatizada
-- **Desarrollo colaborativo**: Flujos de trabajo que permiten contribuciones de múltiples equipos
-- **Escalabilidad**: Arquitectura preparada para incorporar nuevos datos o casos de uso
+#### Flujo de Trabajo de CI (`.github/workflows/build.yml`)
+Nuestro flujo de trabajo principal, definido en `build.yml`, se activa con Pull Requests a las ramas `main` y `dev`.
+Puntos clave:
+-   **Ejecución de Validaciones**: Ejecuta los scripts de PowerShell en un entorno Windows.
+-   **Gestión de Errores**: `continue-on-error: true` en los pasos de validación asegura que todos los scripts se ejecuten.
+-   **Resultados de Pruebas**: Publica los resultados de las pruebas usando `EnricoMi/publish-unit-test-result-action`, visibles en la pestaña "Checks" del Pull Request.
+-   **Bloqueo de Merge a `main`**: Si alguna validación falla (basado en el `outcome` del paso) y el Pull Request es hacia `main`, el flujo de trabajo se marca como fallido (`core.setFailed`), impidiendo el merge si las reglas de protección de rama están configuradas adecuadamente.
 
-## Cómo empezar
+#### Reglas de Protección de Rama
+Hemos configurado reglas de protección para:
+-   **Rama `main`**:
+    -   Requerir un Pull Request antes de fusionar.
+    -   Requerir que las comprobaciones de estado (específicamente el job `FabricValidation` de nuestro workflow) pasen antes de fusionar.
+    -   Opcionalmente, requerir aprobaciones.
+-   **Rama `dev`**:
+    -   Requerir un Pull Request.
+    -   Las comprobaciones de estado pueden ser obligatorias o informativas, permitiendo flexibilidad. La acción `EnricoMi/publish-unit-test-result-action` informará de los errores, pero el merge no se bloqueará automáticamente a menos que se configure explícitamente como un "check" requerido.
 
-1. Clone este repositorio
-2. Configure su entorno Microsoft Fabric
-3. Ejecute el notebook para cargar datos iniciales
-4. Explore los informes de análisis de personajes
-5. Utilice el pipeline de Azure DevOps para validar cambios
+*Para una guía paso a paso sobre cómo configurar GitHub Actions y las Reglas de Protección de Rama, visita nuestro [artículo sobre Calidad con GitHub Actions y Reglas de Protección](enlace-al-articulo-de-github-actions).* (Asegúrate de reemplazar `enlace-al-articulo-de-github-actions` con el enlace correcto)
 
-## Requisitos técnicos
+## Cómo Empezar
 
-- Microsoft Fabric (Power BI, Synapse, etc.)
-- Azure DevOps
-- PowerShell 7.0+
-- Acceso a fuentes de datos Kaggle
+1.  **Clona este repositorio:**
+    ```bash
+    git clone https://github.com/marlizana/GH-Fabric-Dragon-Ball.git # Reemplaza con la URL de tu repositorio si es diferente
+    cd GH-Fabric-Dragon-Ball
+    ```
+2.  **Configura tu entorno Microsoft Fabric:** Asegúrate de tener un workspace y las capacidades necesarias.
+3.  **Explora los artefactos de ejemplo:** Revisa los modelos semánticos y reportes en la carpeta `src/`.
+4.  **Realiza un cambio y crea un Pull Request:** Observa cómo se ejecuta el flujo de trabajo de GitHub Actions y cómo se aplican las validaciones.
+5.  **Revisa los resultados de las validaciones:** En la pestaña "Checks" de tu Pull Request.
 
-## Contribución
+## Requisitos Técnicos
 
-Este proyecto sigue un proceso de contribución basado en pull requests con validación automática de estándares y buenas prácticas para garantizar la calidad del código y los activos analíticos.
+-   Cuenta de GitHub.
+-   Microsoft Fabric (para los artefactos de Power BI, modelos semánticos, etc.).
+-   PowerShell 7.0+ (para ejecutar los scripts localmente si se desea).
+
+
+## Más Información en el Blog
+
+Profundiza en los conceptos y configuraciones revisando nuestros artículos:
+
+1.  [Herramientas de Validación (Scripts PowerShell)](https://medium.com/@akanemar/calidad-nivel-saiyan-automatizando-los-test-de-calidad-y-gobernanza-de-microsoft-fabric-3284b9f06d43)
+2.  [CI/CD en Azure DevOps: Pipelines y Políticas de Rama](https://medium.com/@akanemar/azure-devops-pipelines-y-pol%C3%ADticas-de-ramas-d7b0da495084) (Referencia para la alternativa en Azure DevOps)
+3.  [Calidad con GitHub Actions y Reglas de Protección](enlace-al-articulo-de-github-actions) (¡Asegúrate de actualizar este enlace!)
